@@ -1,0 +1,15 @@
+apiVersion: helm.hops.ops.com.ai/v1alpha1
+kind: Kyverno
+metadata:
+  name: kyverno
+  namespace: example-env
+spec:
+  clusterName: example-cluster
+  labels:
+    team: platform
+  namespace: kyverno
+  values:
+    admissionController:
+      replicas: 3
+    backgroundController:
+      replicas: 2

@@ -1,0 +1,40 @@
+# code: language=yaml
+#
+# Helm release for kyverno
+#
+
+{{- $kv := $state.kyverno }}
+
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $kv.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "helm-release-kyverno" }}
+  labels: {{ $kv.labels | toJson }}
+spec:
+  managementPolicies: {{ $kv.managementPolicies | toJson }}
+  forProvider:
+    chart:
+      name: kyverno
+      repository: https://kyverno.github.io/kyverno
+      version: 3.3.6
+    namespace: {{ $kv.namespace }}
+    {{- if $kv.overrideAllValues }}
+    values:
+      {{- toYaml $kv.overrideAllValues | nindent 6 }}
+    {{- else }}
+    values:
+      fullnameOverride: kyverno
+      nameOverride: kyverno
+      crds:
+        install: true
+      {{- if $kv.values }}
+      {{- toYaml $kv.values | nindent 6 }}
+      {{- end }}
+    {{- end }}
+  rollbackLimit: 3
+  providerConfigRef:
+    name: {{ $kv.providerConfigRef.name }}
+    kind: {{ $kv.providerConfigRef.kind }}
