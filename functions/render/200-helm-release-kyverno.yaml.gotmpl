@@ -2,6 +2,10 @@
 #
 # Helm release for kyverno
 #
+# Integration defaults:
+# - Prometheus metrics enabled for policy enforcement monitoring
+# - ServiceMonitor created for Prometheus Operator discovery
+#
 
 {{- $kv := $state.kyverno }}
 
@@ -30,6 +34,19 @@ spec:
       nameOverride: kyverno
       crds:
         install: true
+      # Prometheus metrics for policy enforcement monitoring
+      admissionController:
+        serviceMonitor:
+          enabled: true
+      backgroundController:
+        serviceMonitor:
+          enabled: true
+      cleanupController:
+        serviceMonitor:
+          enabled: true
+      reportsController:
+        serviceMonitor:
+          enabled: true
       {{- if $kv.values }}
       {{- toYaml $kv.values | nindent 6 }}
       {{- end }}
